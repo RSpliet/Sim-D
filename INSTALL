@@ -1,0 +1,109 @@
+Installation instructions
+======
+
+Requirements:
+- CMake (> 3.7)
+- SystemC (> 2.3.3): https://accellera.org/downloads/standards/systemc
+- Doxygen
+- XercesC - for the drampowerxml library
+
+Required git submodules:
+- Ramulator: https://github.com/RSpliet/ramulator/
+- DRAMPower: https://github.com/RSpliet/DRAMPower/
+
+For Ubuntu 16.04, an up-to-date version of CMake can be obtained from
+Kitware's repository on https://apt.kitware.com/ .
+
+Steps:
+1. `git clone --recurse-submodules https://github.com/RSpliet/Sim-D`
+   (or use the ssh clone URL instead). If the Sim-D repository was already
+   cloned, use `git submodule update --init --recursive` to clone the
+   submodules.
+2. Build and install the submodules in dependencies/ramulator and
+   dependencies/DRAMPower according to their directives. Use CMake for both,
+   such that the main project can properly detect dependencies.
+3. Generate build files in the main project directory using `cmake .`
+   Use a single-target back-end such as Make or Ninja.
+4. Customise the configuration using `ccmake .`
+5. Build using make or ninja.
+
+Further hints
+===
+We forked both ramulator and DRAMPower to add CMake build support, which aids
+in dependency resolving. Additionally, we added DDR4-3200AA parameters to both
+Ramulator and DRAMPower as derived from Micron datasheets. These parameters
+differ slightly from upstream. For reproducibility reasons, we recommend
+using our provided forks and configurations. New experiments can be performed
+using the upstream versions, although we recommend applying our CMake build
+patches for your convenience.
+
+Build was verified on Ubuntu 16.04 using Clang(++) 6.0, and Fedora 30/31/32 
+using Clang(++) 8.0 and higher. In all cases, we ran CMake with the "-G Ninja"
+option to use Ninja as the default build system rather than make. This prevented
+overwriting the makefiles provided by the individual projects and the resulting
+git nightmares. Just like with make, build with ninja, install with ninja
+install.
+
+This project contains several unit tests that, after build, can be run using
+"ninja test" or "make test". These tests rely on C++ assertions and thus are
+only built when the project is configured with the "Debug" build type. For
+normal operations and quantitative experiments, we recommend building Sim-D with
+"RelWithDebInfo" or "Release" build type.
+
+SystemC
+===
+Our project relies on the CMake build and discovery options provided by
+SystemC 2.3.3 or above. Previously, we used a custom SystemC discovery script
+(FindSystemC.cmake) to be able to link against SystemC 2.3.1. We consider
+this latter mechanism deprecated and might remove this script in the future.
+
+On Fedora 30-32, you can easily link against the library provided by the RPM
+in the COPR repository at:
+https://copr.fedorainfracloud.org/coprs/rspliet/SystemC/
+
+If manual build is required, we tested a SystemC 2.3.3 build with the following
+configuration options:
+CC: clang
+CXX: clang++
+BUILD_SHARED_LIBS: OFF
+CMAKE_CXX_STANDARD: 11
+CMAKE_BUILD_TYPE: Release
+SystemC_TARGET_ARCH: linux64
+
+We recommend tuning these SystemC options using ccmake.
+
+DRAMPower
+===
+DRAMPower requires the xerces-c library. On Ubuntu this is provided by the
+libxerces-c-dev package. On Fedora this package is called xerces-c-devel.
+
+Ramulator
+===
+Ramulator does not have any external requirements. We recommend using our
+ramulator fork and building and installing it using CMake as explained in the
+"requirements" section.
+
+Sim-D
+===
+Various CMake parameters, prefixed with MC, allow you to choose the specific
+DRAM configuration that will be used for running simulations. These parameters
+can be easily adjusted using ccmake. Because we rely heavily on templated
+classes to work with SystemC data structures, these parameters are not
+configurable at run-time. These parameters need to be paired with a DRAMPower
+XML file, whose path and filename is currently hard-coded in:
+src/mc/control/CmdArb_DDR4.h
+
+In the future we would like to extend ramulator with a tool that generates a
+stub of such XML files, such that only the power parameters need to be filled
+in manually. Until then, we recommend running Sim-D with the following
+parameters:
+MC_DRAM_BANKS: 8
+MC_DRAM_CHANS: 1
+MC_DRAM_COLS: 1024
+MC_DRAM_ORG: DDR4_8Gb_x16
+MC_DRAM_ROWS: 65536
+MC_DRAM_SPEED: DDR4_3200AA
+
+Note that this speed designation only exists in our ramulator fork. Our
+DRAMPower fork provides an XML file that pairs with this configuration.
+

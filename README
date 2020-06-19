@@ -1,0 +1,70 @@
+Sim-D is a (GPU-like) wide-SIMD architecture tailored for hard real-time
+systems. Inspired by the PRedictable Execution Model (PREM) [1], Sim-D enforces
+isolation between compute- and storage resources, allowing them to be occupied
+in parallel free of interference. By treating a work-group as a sequence of
+compute- and access phases, the problem of WCET analysis becomes a problem of
+scheduling the phases for each work-group in the kernel-instance. Guarantees on
+DRAM request times are facilitated with explicitly-coalesced large DRAM
+transfers, requesting the data (tiles or indirect) for an entire work-group at
+a time. This permits using a closed-page DRAM policy on the boundaries of a
+request, while still allowing the use of deterministic burst request
+re-ordering policies within a request. As a result, a 4KiB tile of data can be
+performed at a guaranteed DRAM bus utilisation of ~72%.
+
+Publication of the accompanying research work is currently under review.
+
+This repository contains both the cycle-accurate simulation model for Sim-D, as
+well as tools that perform WCET analysis on kernels written for Sim-D. This
+source code depends on three external libraries: SystemC, Ramulator[2] and
+DRAMPower[3]. Please refer to the INSTALL file for more details on bulding/
+installing Sim-D and its dependencies. Sim-D's source code is licensed under the
+terms of the GPLv3 or later, of which a copy is included in the LICENSE file.
+
+Usage
+===
+
+After build, two tools can be found in the root directory:
+- main: Performs simulation of a kernel-instance,
+- wcet: Performs WCET analysis of kernel-instance.
+
+For a complete overview of the parameters for each tool, run them without
+arguments. For convenience, the launch/sim and launch/wcet contain bash-scripts
+that invoke these tools for a given benchmark with the correct NDRange and
+work-group dimensions, as well as the parameters needed to validate the
+kernel-instance's output. These scripts should be invoked from the Sim-D root
+directory.
+
+Several auxiliary tools will be built:
+- src/mc/mc: simulate a single tiled DRAM request,
+- src/mc/mcIdx: simulate an iterative indexed DRAM request,
+- src/util/ddr4_lid: Compute the execution time of DRAM requests for a pattern-
+  based DRAM controller [4],
+- src/util/cmp_kfusion_track: Performs output buffer validation for the KFusion
+  track kernel-instance output,
+- src/isa/print: Generate LaTeX-formatted documentation about the ISA.
+- src/stridegen/stridegen: Generate and print the burst requests resulting from
+  a given stride requests, and estimate their longeset isue delay and energy
+  cost when processed by a pattern-based DRAM controller
+- src/stridegen/stridegen_sp: Generate and print the line requests for a given
+  stride request.
+
+To run unit-tests, build Sim-D with a "Debug" build type. This can easily be
+configured using ccmake. After building, tests can be executed with "make test"
+or "ninja test". We recommend configuring Sim-D's build type as either "Release"
+or "RelWithDebugInfo" when intending to execute simulation or WCET analysis for
+performance reasons.
+
+References
+===
+
+[1] R. Pellizzoni, E. Betti, S. Bak, G. Yao, J. Criswell, M. Caccamo, and R.
+Kegley, “A Predictable Execution Model for COTS-Based Embedded Systems,” in 17th
+IEEE Real-Time and Embedded Technology and Applications Symp., April 2011
+[2] Y. Kim, W. Yang, and O. Mutlu, “Ramulator: A fast and extensible dram
+simulator,” IEEE Computer Architecture Letters, vol. 15, no. 1, Jan 2016.
+[3] K. Chandrasekar, C. Weis, Y. Li, S. Goossens, M. Jung, O. Naji, B. Akesson,
+N. Wehn, and K. Goossens. DRAMPower: Open-source DRAM Power & Energy Estimation
+Tool, 2012.
+[4] B. Akesson, K. Goossens, and M. Ringhofer, “Predator: A Predictable SDRAM
+Memory Controller,” in Proc. 5th IEEE/ACM Int. Conf. on Hardware/Software
+Codesign and System Synthesis. 2007 

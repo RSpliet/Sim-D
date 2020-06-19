@@ -1,0 +1,37 @@
+# Ignore CMake generated stuff
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+Testing
+src/isa/print
+src/mc/test/bin
+src/mc/mc
+src/mc/mcIdx
+src/mc/IdxIterator
+src/compute/test/bin
+src/compute/compute
+src/stridegen/sp_stridegen
+src/stridegen/stridegen
+src/util/cmp_kfusion_track
+src/util/ddr4_lid
+
+# Ninja
+.ninja*
+*.ninja
+
+# Patches
+*.patch
+
+# Make
+Makefile
+
+# Generated files and binaries
+docs/html
+main
+wcet
+!wcet/
+/Test_*
+*.o

@@ -1,0 +1,6 @@
+[submodule "dependencies/ramulator"]
+	path = dependencies/ramulator
+	url = https://github.com/RSpliet/ramulator.git
+[submodule "dependencies/drampower"]
+	path = dependencies/drampower
+	url = https://github.com/RSpliet/DRAMPower.git
