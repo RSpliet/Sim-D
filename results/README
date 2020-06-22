@@ -1,0 +1,6 @@
+The contents of this folder allow to recreate all graphs used in my thesis. Most
+data was acquired using the various scripts in ../launch, and then transformed
+into the CSV data sets using LibreOffice Calc. Comparative data from OpenCL
+benchmarks running on NVIDIA graphics cards was generated using the CLaxon
+OpenCL benchmark repository, which can be found on:
+https://github.com/RSpliet/CLaxon

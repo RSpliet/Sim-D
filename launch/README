@@ -1,0 +1,99 @@
+Scripts in this directory and its sub-directories should be launched from
+Sim-D's root directory.
+
+These scripts merely generate the data. The form of the output is chosen to be
+fairly convenient for post-processing, but some manual work may be required
+to transform this output into the CSV data-sets found in the "results"
+directory. These CSVs may combine results from multiple scripts, and the output
+of one script may be relevant for multiple graphs.
+
+Comparative data from commercial graphics cards was obtained using the CLaxon
+OpenCL benchmark suite, to be found on https://github.com/RSpliet/CLaxon .
+
+Chapter 5.1
+===
+Patterns as encoded in src/stridegen/stridegen.cpp were generated using an ILP-
+enabled version of Sven Goossen's patterngen. The original archive used no
+longer exists in the public, but similar results can likely be obtained using
+the branch found on:
+https://git.ics.ele.tue.nl/Public0/real-time-sdram-trade-offs
+
+This stridegen tool is used to create comparative data between 1D/2D stride
+patterns executed by Sim-D's DRAM controller and various pattern-based DRAM
+controller configurations. For the figures in this section, stridegen was
+invoked with the "-g" parameter.
+
+Chapter 5.4
+===
+Data for the unit-stride analysis is generated with src/mc/mc. An example
+invocation for a 1024-word unit-stride transfer for all possible alignments is.
+# src/mc/mc -s 0,1024,1024,1,0,0 -S -p
+
+Further analysis can be done on the worst patterns by adding the -t parameter
+and fixing an alignment by setting the start address. The start address is
+always interpreted as hexadecimal. For example:
+# src/mc/mc -s a00,1024,1024,1,0,0 -t -p
+
+The "idxit" scripts determine the latency of a large number of combinations (not
+necessarily all) of word offsets to be fed to the memory controller's index
+iterator front-end. Each combination is 16 indexes long. The word-indexes and
+start of buffer are chosen to represent words in each of the banks under the
+default configuration of Sim-D:
+ MC_DRAM_BANKS                    8
+ MC_DRAM_CHANS                    1
+ MC_DRAM_COLS                     1024
+ MC_DRAM_ORG                      DDR4_8Gb_x16
+ MC_DRAM_ROWS                     65536
+ MC_DRAM_SPEED                    DDR4_3200AA
+
+The output is the latency of each combination. This combination can then be
+studied further by feeding it to the mcidx tool manually and enabling command
+emission trace, using an invocation similar to:
+# echo "[ptrn]" | src/mc/mcIdx -f - -b 0x3fbc -t
+
+Chapter 5.5
+===
+Unit stride transfer times are obtained using the ch5_5_1_unit.sh script. These
+results can be combined with the pattern-based data from Chapter 5.1 for
+comparison. Configuration and building of Sim-D must be performed manually for
+each DRAM configuration you wish to test. 
+
+Data for the non-unit stride (tiled) transfers in Chapter 5.5.2 is obtained with
+the ch5_5_2_*.sh scripts. These scripts output (partial) latex tabular for
+convenience.
+
+Data for comparing the latencies of the two indexed transfer methods is
+generated using the ddr4_idx tool in src/util/. Currently this is hard-coded for
+the DDR4-3200AA configurations.
+
+Chapter 6
+===
+ch6_2_2_param_cfg.sh: obtains data for 15 benchmarks under decode pipeline
+                      depths of 1 and 3, and execute pipeline depths between 3
+                      and 6.
+ch6_param_sp_avg.sh:  Obtains data for 15 benchmarks under the decode pipeline
+                      depth of 3, and a 5-stage pipeline depth. Can be used for
+                      both comparative information on scratchpad bus width
+                      (chapter 6.2.2) and average case performance.
+
+Usage characterisation (chapter 6.1, 6.4.1 and 6.4.2) was extracted manually.
+The quickest way is to run the relevant benchmarks in launch/sim with the
+"-D prg -n 1" flags.
+
+Chapter 7
+===
+Data for the resource utilisation graphs can be obtained by launching a relevant
+simulation with the "-D pipe_wg_status_code" flag and writing the output to a
+file. To reduce run-times, override the NDrange using the -d flag to only launch
+2 or 4 work-groups. The gnuplot scripts in results/ch7_scheduling_policies
+provide many examples of how to render the graphs from the data captured.
+
+ch7_5_1_sched_avg.sh:  Simulates benchmarks under various scheduling policies,
+                       fixing the pipeline to 3 stage decode, 5 stage execute.
+ch7_5_2_sched_wcet.sh: Runs the same set of benchmarks through the WCET analysis
+					   tool, for the same pipeline configuration. Results of the
+					   two scripts can be combined to generate the table and
+					   figure in this subsection.
+ch7_5_3_1_sched_unroll.sh, ch_7_5_3_3_sched_tiling.sh:
+                       Simulates and computes the WCET for benchmarks comparing
+                       optimised with unoptimised versions.
