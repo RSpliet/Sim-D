@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <inttypes.h>
 #include <cstring>
+#include <cstdarg>
+#include <limits>
 #include <iomanip>
 #include <unistd.h>
 #include <algorithm>

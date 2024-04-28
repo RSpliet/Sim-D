@@ -33,7 +33,7 @@ find_package(drampower REQUIRED)
 find_package(XercesC REQUIRED)
 add_definitions(-DRAMULATOR)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 find_package(Doxygen)
 
