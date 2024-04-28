@@ -142,7 +142,7 @@ public:
 		SC_THREAD(thread_lt);
 		sensitive << in_clk.pos();
 
-		SC_THREAD(thread_status)
+		SC_THREAD(thread_status);
 		sensitive << in_clk.pos();
 
 		for (i = 0; i < DRAM_BANKS; i++) {
